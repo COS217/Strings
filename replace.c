@@ -20,7 +20,42 @@
 static size_t replaceAndWrite(const char *pcLine,
                               const char *pcFrom, const char *pcTo)
 {
-   /* Insert your code here. */
+   size_t uReplacementCount = 0;
+   const char *pcCurrent = pcLine;
+   const char *pcMatch;
+
+   /* Handle empty from string case - just write the line */
+   if (pcFrom[0] == '\0') {
+      printf("%s", pcLine);
+      return 0;
+   }
+
+   while ((pcMatch = Str_search(pcCurrent, pcFrom)) != NULL) {
+      /* Write characters before the match */
+      while (pcCurrent < pcMatch) {
+         putchar(*pcCurrent);
+         pcCurrent++;
+      }
+
+      /* Write the replacement string */
+      const char *pcTemp = pcTo;
+      while (*pcTemp != '\0') {
+         putchar(*pcTemp);
+         pcTemp++;
+      }
+
+      /* Move past the matched string */
+      pcCurrent += Str_getLength(pcFrom);
+      uReplacementCount++;
+   }
+
+   /* Write remaining characters */
+   while (*pcCurrent != '\0') {
+      putchar(*pcCurrent);
+      pcCurrent++;
+   }
+
+   return uReplacementCount;
 }
 
 /*--------------------------------------------------------------------*/
@@ -52,11 +87,19 @@ int main(int argc, char *argv[])
       return EXIT_FAILURE;
    }
 
+   /* Check for empty from string case */
+   if (argv[1][0] == '\0') {
+      fprintf(stderr, "0 replacements\n");
+      return 0;
+   }
+
    pcFrom = argv[1];
    pcTo = argv[2];
 
-   while (fgets(acLine, MAX_LINE_SIZE, stdin) != NULL)
-      /* Insert your code here. */
+   while (fgets(acLine, MAX_LINE_SIZE, stdin) != NULL) {
+      /* Replace occurrences and write the modified line */
+      uReplaceCount += replaceAndWrite(acLine, pcFrom, pcTo);
+   }
 
    fprintf(stderr, "%lu replacements\n", (unsigned long)uReplaceCount);
    return 0;
